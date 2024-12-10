@@ -1,4 +1,4 @@
-# Encuesta-jovenes-epidemiologia
+# Encuesta-jovenes-epidemiología
 Este repositorio  es para el ramo de Epidemiología ll del Magíster en Informática Médica cohoerte 2024.
 
 Dentro del archivo cuestionario, se pueden evidenciar cada pregunta correspondiente a su numero por ejemplo:
@@ -55,5 +55,5 @@ El modelo de **Regresión Logística** supera al de **Random Forest** en todas l
 
 Por otro lado, **Random Forest**, aunque presenta una especificidad razonable, falla en sensibilidad y precisión. Esto limita su utilidad en contextos donde es crucial detectar correctamente los casos positivos.
 
-![Gráfico comparativo de métricas de desempeño de los modelos ](https://github.com/Magdasanhueza/Encuesta-jovenes-epidemiologia/blob/main/CurvasROCcomparativas.png)
+![Gráfico comparativo de métricas de desempeño de los modelos ](https://github.com/Magdasanhueza/Encuesta-jovenes-epidemiologia/blob/main/desempe%C3%B1oModelos.png)
 
