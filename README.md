@@ -24,4 +24,4 @@ En el gráfico generado, la línea azul corresponde al modelo de **Regresión Lo
 
 Para mejorar el desempeño de los modelos, se podrían considerar ajustes en la selección de variables predictoras, optimización de hiperparámetros (como el número de árboles y variables en Random Forest) o incluso probar con otros algoritmos como SVM o Gradient Boosting. Además, la recolección de más datos podría mejorar significativamente la capacidad predictiva. Este gráfico proporciona una base clara para comparar el desempeño de los modelos y buscar formas de mejorar su efectividad.
 
-![Curva ROC comparativa](https://github.com/nicolarabarca/SCL017-memory-match-game/blob/master/src/assets/prototipo%20de%20baja%20fidelidad.jpg](https://github.com/Magdasanhueza/Encuesta-jovenes-epidemiologia/blob/main/CurvasROCcomparativas.png)
+![Curva ROC comparativa](https://github.com/Magdasanhueza/Encuesta-jovenes-epidemiologia/blob/main/CurvasROCcomparativas.png)
