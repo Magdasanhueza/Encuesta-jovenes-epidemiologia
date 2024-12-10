@@ -47,6 +47,8 @@ Con base en las métricas proporcionadas para los modelos de **Random Forest** y
 - **Random Forest:** 0.4483 → Este modelo tiene una exactitud general de 44.83%, indicando que casi la mitad de las predicciones totales son correctas.
 - **Regresión Logística:** 0.6207 → La exactitud es mayor en este modelo (62.07%), lo que lo hace más efectivo globalmente.
 
+
+![Gráfico comparativo de métricas de desempeño de los modelos ](https://github.com/Magdasanhueza/Encuesta-jovenes-epidemiologia/blob/main/desempe%C3%B1oModelos.png)
 ---
 
 ## Comparación General
@@ -55,5 +57,4 @@ El modelo de **Regresión Logística** supera al de **Random Forest** en todas l
 
 Por otro lado, **Random Forest**, aunque presenta una especificidad razonable, falla en sensibilidad y precisión. Esto limita su utilidad en contextos donde es crucial detectar correctamente los casos positivos.
 
-![Gráfico comparativo de métricas de desempeño de los modelos ](https://github.com/Magdasanhueza/Encuesta-jovenes-epidemiologia/blob/main/desempe%C3%B1oModelos.png)
 
