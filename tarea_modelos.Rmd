@@ -1,0 +1,158 @@
+---
+title: "Analysis_script"
+author: "MICHELLE-TATIANA-MAGDALENA"
+date: "2024-12-10"
+output: pdf_document
+---
+
+## Introducción
+
+En este análisis se entrenan dos modelos de Machine Learning, **Regresión Logística** y **Random Forest**, para predecir la variable dependiente `P103` (¿Recibes actualmente algún tratamiento para algún problema de salud mental, como una depresión, ansiedad u otro?). 
+
+El desempeño de los modelos se evalúa mediante las siguientes métricas:
+- Sensibilidad
+- Especificidad
+- Precisión (Valor Predictivo Positivo)
+- Exactitud
+- AUC (Área Bajo la Curva)
+
+Se incluye una visualización comparativa de las métricas.
+
+---
+
+## Carga de Librerías y Datos
+
+### **Explicación**
+1. Se cargan las librerías necesarias para manipular datos, entrenar modelos y graficar resultados.
+2. Se cargan los datos (en este caso simulados) que incluyen la variable dependiente `P103` y varias características predictoras.
+
+```{r setup}
+# Configuración inicial
+knitr::opts_chunk$set(echo = TRUE)
+
+# Cargar librerías necesarias
+library(dplyr)
+library(caret)
+library(randomForest)
+library(pROC)
+library(ggplot2)
+
+# Carga de datos simulados
+set.seed(42)
+data <- data.frame(
+  P103 = sample(c("1. Si", "2. No"), 100, replace = TRUE),
+  SEXO = sample(c("Femenino", "Masculino"), 100, replace = TRUE),
+  EDAD = sample(15:30, 100, replace = TRUE),
+  REGION = sample(c("Norte", "Centro", "Sur"), 100, replace = TRUE)
+)
+
+# Convertir la variable dependiente a factor
+data$P103 <- as.factor(data$P103)
+
+
+#-------------------------------------------------------------------------
+
+#División de Datos en Entrenamiento y Prueba
+#Los datos se dividen en dos conjuntos:
+#Entrenamiento (70%): Se utiliza para entrenar los modelos.
+#Prueba (30%): Se utiliza para evaluar el desempeño de los modelos.
+#La división asegura que los datos de prueba sean completamente independientes de los de entrenamiento.
+
+# Dividir los datos en entrenamiento y prueba (70% - 30%)
+train_index <- createDataPartition(data$P103, p = 0.7, list = FALSE)
+train_data <- data[train_index, ]
+test_data <- data[-train_index, ]
+
+#---------------------------------------------------------------------------
+
+#Modelos Predictivos
+#Regresión Logística
+#Se entrena un modelo de Regresión Logística utilizando las variables predictoras.
+#Se generan predicciones para el conjunto de prueba en forma de probabilidades.
+
+# Entrenar el modelo de Regresión Logística
+logistic_model <- glm(P103 ~ ., data = train_data, family = "binomial")
+
+# Predicciones de Regresión Logística
+logistic_preds <- predict(logistic_model, newdata = test_data, type = "response")
+logistic_class <- ifelse(logistic_preds > 0.5, "1. Si", "2. No")
+
+#---------------------------------------------------------------------------
+
+#Random Forest
+#Se entrena un modelo de Random Forest, que utiliza múltiples árboles de decisión para hacer predicciones.
+#Se generan predicciones para el conjunto de prueba.
+
+# Entrenar el modelo de Random Forest
+rf_model <- randomForest(P103 ~ ., data = train_data, ntree = 100)
+
+# Predicciones de Random Forest
+rf_preds <- predict(rf_model, newdata = test_data, type = "prob")[, "1. Si"]
+rf_class <- ifelse(rf_preds > 0.5, "1. Si", "2. No")
+
+
+#-------------------------------------------------------------------------
+
+#Evaluación de Desempeño
+#Métricas de Desempeño
+#Se utilizan matrices de confusión para calcular métricas de desempeño como: Sensibilidad, Especificidad, Precisión (Valor Predictivo Positivo), Exactitud.
+#Estas métricas permiten evaluar qué tan bien los modelos clasifican correctamente.
+
+# Crear matrices de confusión
+logistic_cm <- confusionMatrix(factor(logistic_class, levels = levels(test_data$P103)), test_data$P103, positive = "1. Si")
+rf_cm <- confusionMatrix(factor(rf_class, levels = levels(test_data$P103)), test_data$P103, positive = "1. Si")
+
+# Mostrar métricas
+logistic_cm$byClass  # Regresión Logística
+rf_cm$byClass        # Random Forest
+
+
+#------------------------------------------------------------------------
+
+#Comparación Visual de Métricas
+#Se crea un gráfico de barras que compara las métricas de desempeño de ambos modelos.
+#Esto facilita la interpretación visual de los resultados.
+
+# Crear un DataFrame con métricas
+metricas <- data.frame(
+  Modelo = c("Logística", "Logística", "Logística", "Logística", "Logística",
+             "Random Forest", "Random Forest", "Random Forest", "Random Forest", "Random Forest"),
+  Métrica = rep(c("Sensibilidad", "Especificidad", "Precisión", "Exactitud", "AUC"), 2),
+  Valor = c(
+    logistic_cm$byClass["Sensitivity"], logistic_cm$byClass["Specificity"],
+    logistic_cm$byClass["Pos Pred Value"], logistic_cm$overall["Accuracy"], auc(roc(test_data$P103_binary, logistic_preds)),
+    rf_cm$byClass["Sensitivity"], rf_cm$byClass["Specificity"],
+    rf_cm$byClass["Pos Pred Value"], rf_cm$overall["Accuracy"], auc(roc(test_data$P103_binary, rf_preds))
+  )
+)
+
+# Graficar las métricas
+ggplot(metricas, aes(x = Métrica, y = Valor, fill = Modelo)) +
+  geom_bar(stat = "identity", position = "dodge", color = "black") +
+  geom_text(aes(label = round(Valor, 3)), position = position_dodge(0.9), vjust = -0.25) +
+  labs(title = "Desempeño Comparativo de Modelos", y = "Proporción", x = "Métrica") +
+  scale_y_continuous(limits = c(0, 1)) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_fill_manual(values = c("pink", "green"))
+
+![Desempeño comparativos de modelos](C:/Users/magda/Documents/Mg/2do semestre/Epidemiología/Epidemiología ll/Github Epidemiologia/desempeñoModelos.png)
+
+#---------------------------------------------------------------------------
+
+#Curvas ROC
+#Se calculan y grafican las curvas ROC para ambos modelos.
+#El AUC (Área Bajo la Curva) mide la capacidad de los modelos para distinguir entre clases positivas y negativas.
+
+# Calcular Curvas ROC
+test_data$P103_binary <- ifelse(test_data$P103 == "1. Si", 1, 0)
+logistic_auc <- roc(test_data$P103_binary, logistic_preds)
+rf_auc <- roc(test_data$P103_binary, rf_preds)
+
+# Graficar las curvas
+plot(logistic_auc, col = "blue", main = "Curvas ROC Comparativas")
+plot(rf_auc, col = "red", add = TRUE)
+legend("bottomright", legend = c("Logística", "Random Forest"), col = c("blue", "red"), lwd = 2)
+
+
+
